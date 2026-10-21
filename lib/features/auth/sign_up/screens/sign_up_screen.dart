@@ -4,7 +4,7 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/theme.dart';
 import '../../login/screens/login_screen.dart';
-
+import '../../services/auth_service.dart';
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -18,12 +18,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
 
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
+
   @override
   void initState() {
     nameController = TextEditingController();
     emailController = TextEditingController();
     passwordController = TextEditingController();
-
     super.initState();
   }
 
@@ -108,16 +110,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 40),
+
                 PrimaryButton(
-                  text: 'Sign Up',
-                  onPressed: () async {
+                  text: _isLoading ? 'Creating Account...' : 'Sign Up',
+                  onPressed: _isLoading ? null : () async {
                     if (_formKey.currentState?.validate() ?? false) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
+
+                      setState(() {
+                        _isLoading = true;
+                      });
+
+                      try {
+                        String defaultAvatarUrl = 'https://i.imgur.com/LDOO21B.jpg';
+
+                        var user = await _authService.signUp(
+                          name: nameController.text.trim(),
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                          avatarUrl: defaultAvatarUrl,
+                        );
+
+                        print('✅ Account created successfully : ${user.name}');
+
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Account created successfully! Please login.'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+
+                      } catch (e) {
+                        print('❌ fail to create account: $e');
+
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Sign Up Failed: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+                      }
+
                     }
                   },
                 ),
@@ -132,22 +179,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                            ) => const LoginScreen(),
+                                context,
+                                animation,
+                                secondaryAnimation,
+                                ) => const LoginScreen(),
                             transitionsBuilder:
                                 (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
+                                context,
+                                animation,
+                                secondaryAnimation,
+                                child,
                                 ) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
                           ),
                         );
                       },

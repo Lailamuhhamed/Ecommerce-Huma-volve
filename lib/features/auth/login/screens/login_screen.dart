@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/custom_text_field.dart';
@@ -6,7 +5,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/theme.dart';
 import '../../../main_navigation/screens/main_navigation_screen.dart';
 import '../../sign_up/screens/sign_up_screen.dart';
-
+import '../../services/auth_service.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -19,11 +18,13 @@ class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
 
+  final AuthService _authService = AuthService();
+  bool _isLoading = false ;
+
   @override
   void initState() {
     emailController = TextEditingController();
     passwordController = TextEditingController();
-
     super.initState();
   }
 
@@ -106,15 +107,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
+
                 PrimaryButton(
                   text: 'Login',
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => MainNavigationScreen(),
-                        ),
-                      );
+
+                      try {
+                        var response = await _authService.login(
+                          emailController.text.trim(),
+                          passwordController.text.trim(),
+                        );
+
+                        print('Success${response.accessToken}');
+
+                        if (!mounted) return;
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const MainNavigationScreen(),
+                          ),
+                        );
+
+                      } catch (e) {
+                        print('❌   error: $e');
+
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Login Failed: Please check your credentials'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+
                     }
                   },
                 ),
@@ -129,22 +154,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                            ) => const SignUpScreen(),
+                                context,
+                                animation,
+                                secondaryAnimation,
+                                ) => const SignUpScreen(),
                             transitionsBuilder:
                                 (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
+                                context,
+                                animation,
+                                secondaryAnimation,
+                                child,
                                 ) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
                           ),
                         );
                       },
