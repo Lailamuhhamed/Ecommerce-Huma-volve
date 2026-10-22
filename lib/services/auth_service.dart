@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import '../model/Auth_response_model.dart';
-import '../model/User_model.dart';
+import '../features/auth/model/Auth_response_model.dart';
+import '../features/auth/model/User_model.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
 
