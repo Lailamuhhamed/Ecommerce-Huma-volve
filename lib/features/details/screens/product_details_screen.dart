@@ -1,3 +1,4 @@
+import 'package:ecommerce_app_huma_volve/features/auth/model/Products_model.dart';
 import 'package:flutter/material.dart';
 import '../../../core/dummy_data.dart';
 import '../../../core/theme.dart';
@@ -6,7 +7,7 @@ import '../widgets/size_selector.dart';
 import '../../../core/widgets/primary_button.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
@@ -88,7 +89,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            widget.product.name,
+                            widget.product.title,
                             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               fontSize: 28,
                               height: 1.2,
@@ -160,7 +161,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${widget.product.name} added to cart'),
+                            content: Text('${widget.product.title} added to cart'),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
