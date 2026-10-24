@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../features/auth/model/category_model.dart';
+import '../features/home/data/models/category_model.dart';
 import 'api_service.dart';
 
 class CategoryService {

@@ -1,13 +1,12 @@
-import '../features/auth/model/Products_model.dart';
+import '../../domain/entities/home_product_entity.dart';
 
 abstract class ProductState {}
 
 class ProductInitial extends ProductState {}
-
 class ProductLoading extends ProductState {}
 
 class ProductLoaded extends ProductState {
-  final List<ProductModel> products;
+  final List<HomeProductEntity> products;
   ProductLoaded(this.products);
 }
 

@@ -1,12 +1,19 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/dummy_data.dart';
-import '../../../core/theme.dart';
-import '../../../cubits/product_cubit.dart';
-import '../../../cubits/product_state.dart';
-import '../../../cubits/category_cubit.dart';
-import '../../../cubits/category_state.dart';
+
+import '../../../../core/dummy_data.dart';
+import '../../../../core/theme.dart';
+import '../../../../services/api_service.dart';
+import '../../data/data_source/data_source_impl.dart';
+import '../../data/repositories/HomeRepositoryImpl.dart';
+import '../../domain/use_case/get_category_use_case.dart';
+import '../../domain/use_case/get_products_use_case.dart';
+import '../cubit/category_cubit.dart';
+import '../cubit/category_state.dart';
+import '../cubit/product_cubit.dart';
+import '../cubit/product_state.dart';
 import '../widgets/product_card.dart';
 import '../widgets/category_chip.dart';
 
@@ -25,8 +32,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _productCubit = ProductCubit()..fetchProducts();
-    _categoryCubit = CategoryCubit()..fetchCategories();
+
+    final dio = ApiService().dio;
+    final remoteDataSource = HomeRemoteDataSourceImpl(dio: dio);
+    final repository = HomeRepositoryImpl(remoteDataSource: remoteDataSource);
+
+    _productCubit = ProductCubit(
+      getProductsUseCase: GetProductsUseCase(repository),
+    )..fetchProducts();
+
+    _categoryCubit = CategoryCubit(
+      getCategoriesUseCase: GetCategoriesUseCase(repository),
+    )..fetchCategories();
   }
 
   @override

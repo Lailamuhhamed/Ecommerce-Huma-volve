@@ -1,10 +1,14 @@
+// lib/features/home/presentation/widgets/product_card.dart
+
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
-import '../../auth/model/Products_model.dart';
-import '../../details/screens/product_details_screen.dart';
+
+import '../../../../core/theme.dart';
+import '../../../details/screens/product_details_screen.dart';
+import '../../domain/entities/home_product_entity.dart';
+
 
 class ProductCard extends StatelessWidget {
-  final ProductModel product;
+  final HomeProductEntity product;
 
   const ProductCard({super.key, required this.product});
 
@@ -49,10 +53,13 @@ class ProductCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                       child: Image.network(
-                        product.imageUrl,
+                        product.image ?? '',
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
+                        errorBuilder: (context, error, stackTrace) => const Center(
+                          child: Icon(Icons.broken_image, color: Colors.grey),
+                        ),
                       ),
                     ),
                   ),
@@ -84,7 +91,7 @@ class ProductCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      product.title, // 👈 استخدام title
+                      product.name ?? 'No Name',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -98,7 +105,7 @@ class ProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${product.price.toStringAsFixed(2)}',
+                          '\$100.00',
                           style: const TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.bold,
