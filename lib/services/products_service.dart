@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../features/auth/model/Products_model.dart';
+import '../features/home/data/models/product_model.dart';
 import 'api_service.dart';
 
 class ProductService {

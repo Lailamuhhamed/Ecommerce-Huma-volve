@@ -1,13 +1,14 @@
-import 'package:ecommerce_app_huma_volve/features/auth/model/Products_model.dart';
+// lib/features/details/screens/product_details_screen.dart
+
 import 'package:flutter/material.dart';
-import '../../../core/dummy_data.dart';
 import '../../../core/theme.dart';
+import '../../home/domain/entities/home_product_entity.dart'; // 👈 استيراد الـ Entity
 import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
 import '../../../core/widgets/primary_button.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final ProductModel product;
+  final HomeProductEntity product; // 👈 استقبال الـ Entity هنا
 
   const ProductDetailsScreen({super.key, required this.product});
 
@@ -22,8 +23,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedColor = widget.product.colors.first;
-    _selectedSize = widget.product.sizes.first;
+    // استخدام القيم القادمة من الـ Entity مع قيم افتراضية للحماية
+    _selectedColor = (widget.product.colors != null && widget.product.colors!.isNotEmpty)
+        ? _parseColor(widget.product.colors!.first)
+        : Colors.black;
+    _selectedSize = (widget.product.sizes != null && widget.product.sizes!.isNotEmpty)
+        ? widget.product.sizes!.first
+        : 'M';
+  }
+
+  // دالة مساعدة لتحويل النصوص لألوان إذا لزم الأمر
+  Color _parseColor(String colorStr) {
+    // يمكنك تخصيصها حسب شكل الألوان القادمة من الـ API
+    return Colors.blue;
   }
 
   @override
@@ -65,8 +77,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               background: Hero(
                 tag: 'product-${widget.product.id}',
                 child: Image.network(
-                  widget.product.imageUrl,
+                  widget.product.image ?? '',
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  ),
                 ),
               ),
             ),
@@ -89,7 +104,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            widget.product.title,
+                            widget.product.name ?? 'No Name',
                             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               fontSize: 28,
                               height: 1.2,
@@ -98,7 +113,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          '\$${widget.product.price.toStringAsFixed(2)}',
+                          '\$${widget.product.price?.toStringAsFixed(2) ?? '0.00'}',
                           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                             color: AppTheme.primary,
                             fontSize: 24,
@@ -115,7 +130,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.product.description,
+                      widget.product.description ?? 'No description available.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         height: 1.6,
                         fontSize: 16,
@@ -130,7 +145,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(height: 12),
                     ColorSelector(
-                      colors: widget.product.colors,
+                      colors: (widget.product.colors != null && widget.product.colors!.isNotEmpty)
+                          ? widget.product.colors!.map((colorName) => _parseColor(colorName)).toList()
+                          : [Colors.black, Colors.blue, Colors.grey], // قائمة افتراضية احتياطية
                       selectedColor: _selectedColor,
                       onColorSelected: (color) {
                         setState(() {
@@ -147,7 +164,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(height: 12),
                     SizeSelector(
-                      sizes: widget.product.sizes,
+                      sizes: widget.product.sizes ?? [],
                       selectedSize: _selectedSize,
                       onSizeSelected: (size) {
                         setState(() {
@@ -161,7 +178,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${widget.product.title} added to cart'),
+                            content: Text('${widget.product.name} added to cart'),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
