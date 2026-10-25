@@ -1,7 +1,7 @@
+// lib/features/home/presentation/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 import '../../../../core/dummy_data.dart';
 import '../../../../core/theme.dart';
@@ -27,11 +27,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final ProductCubit _productCubit;
   late final CategoryCubit _categoryCubit;
+  late final ScrollController _scrollController;
   int? _selectedCategoryId;
 
   @override
   void initState() {
     super.initState();
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
 
     final dio = ApiService().dio;
     final remoteDataSource = HomeRemoteDataSourceImpl(dio: dio);
@@ -46,8 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
     )..fetchCategories();
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
+      _productCubit.loadMoreProducts();
+    }
+  }
+
   @override
   void dispose() {
+    _scrollController.dispose();
     _productCubit.close();
     _categoryCubit.close();
     super.dispose();
@@ -64,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppTheme.background,
         body: SafeArea(
           child: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -179,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         setState(() {
                                           _selectedCategoryId = null;
                                         });
-                                        _productCubit.fetchProducts(categoryId: null);
+                                        _productCubit.fetchProducts(categoryId: null, isRefresh: true);
                                       },
                                     );
                                   }
@@ -194,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       setState(() {
                                         _selectedCategoryId = category.id;
                                       });
-                                      _productCubit.fetchProducts(categoryId: category.id);
+                                      _productCubit.fetchProducts(categoryId: category.id, isRefresh: true);
                                     },
                                   );
                                 },
