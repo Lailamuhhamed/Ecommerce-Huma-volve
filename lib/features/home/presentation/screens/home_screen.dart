@@ -1,8 +1,6 @@
-// lib/features/home/presentation/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../core/dummy_data.dart';
 import '../../../../core/theme.dart';
 import '../../../../services/api_service.dart';

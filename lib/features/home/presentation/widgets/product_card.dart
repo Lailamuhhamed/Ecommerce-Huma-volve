@@ -1,11 +1,8 @@
-// lib/features/home/presentation/widgets/product_card.dart
 
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
-import '../../../details/screens/product_details_screen.dart';
 import '../../domain/entities/home_product_entity.dart';
-
 
 class ProductCard extends StatelessWidget {
   final HomeProductEntity product;
@@ -16,17 +13,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 500),
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                ProductDetailsScreen(product: product),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-          ),
-        );
+          context.push('/details/${product.id}');
       },
       child: Container(
         decoration: BoxDecoration(
@@ -105,7 +92,7 @@ class ProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$100.00',
+                          '\$${product.price?.toStringAsFixed(2) ?? '0.00'}',
                           style: const TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.bold,
